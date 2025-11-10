@@ -1,49 +1,53 @@
 name: evolution
-description: "Evolution: Seu aplicativo de evolução pessoal e gamificação de hábitos."
+description: "Evolution: Aplicativo de evolução pessoal e gamificação de hábitos."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none'
 
+# The following defines the version and build number for your application.
 version: 1.0.0+1
 
 environment:
-  # Mantenho o SDK estável, mas o Flutter geralmente acompanha o SDK Dart mais recente.
-  # Use ^3.0.0 ou o que for compatível com sua versão atual do Flutter.
   sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
 
-  # --- Dependências Principais do Projeto ---
+  # --- Dependências do HIVE (Banco de Dados Local) ---
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0 # Para usar o Hive em apps Flutter
 
-  # 1. Supabase: Essencial para autenticação e banco de dados.
-  supabase_flutter: ^2.5.0 # Use a versão mais recente
+  # --- Dependências de UI/Gamificação ---
+  fl_chart: ^0.68.0 # Gráficos para visualização de progresso
+  lottie: ^3.1.2 # Animações para gamificação (ganhar XP, subir de nível)
 
-  # 2. Gerenciamento de Estado (Opcional, mas recomendado para projetos maiores)
-  # provider: ^6.1.2 # Exemplo de State Management
-
-  # 3. Gráficos: Necessário para visualizar o progresso (solução para o Problema 2).
-  fl_chart: ^0.68.0 # Uma das bibliotecas de gráficos mais populares
-
-  # 4. Animações: Pode ser usado para gamificação e frases motivacionais.
-  lottie: ^3.1.2 # Para animações Lottie (como ganhar XP ou subir de nível)
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+  # font_awesome_flutter: ^10.7.0 # Removido para evitar erros de compilação
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
+  # --- Dependências de Geração de Código do HIVE ---
+  # O gerador de código para criar os adaptadores de modelo de dados do Hive
+  hive_generator: ^2.0.1
+  # Ferramenta para executar o gerador de código automaticamente
+  build_runner: ^2.4.9
+
   flutter_lints: ^5.0.0 # Mantido para boas práticas
 
-# The following section is specific to Flutter packages.
+# A seção a seguir é específica do Flutter.
 flutter:
   uses-material-design: true
 
-  # Para adicionar assets Lottie ou outros recursos.
-  # assets:
-  #   - assets/lottie/level_up.json
-  #   - assets/lottie/confetti.json
+  # --- CORREÇÃO DE ASSETS ---
+  # A seção 'assets:' deve estar AQUI, com este recuo (dois espaços).
+  assets:
+    # É melhor registrar a pasta inteira (com a barra / no final)
+    # Assim, qualquer imagem que você adicionar em 'assets/images/'
+    # será reconhecida automaticamente.
+    - assets/images/
+    #
+    # Se preferir registrar apenas o arquivo exato (como estava antes):
+    # - assets/images/logo_evolution.png
