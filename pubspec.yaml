@@ -14,6 +14,9 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # --- Dependência da API GEMINI (NOVO) ---
+  google_generative_ai: ^0.4.7 # Use a versão mais recente e estável
+
   # --- Dependências do HIVE (Banco de Dados Local) ---
   hive: ^2.2.3
   hive_flutter: ^1.1.0 # Para usar o Hive em apps Flutter
@@ -30,9 +33,7 @@ dev_dependencies:
     sdk: flutter
 
   # --- Dependências de Geração de Código do HIVE ---
-  # O gerador de código para criar os adaptadores de modelo de dados do Hive
   hive_generator: ^2.0.1
-  # Ferramenta para executar o gerador de código automaticamente
   build_runner: ^2.4.9
 
   flutter_lints: ^5.0.0 # Mantido para boas práticas
@@ -42,12 +43,5 @@ flutter:
   uses-material-design: true
 
   # --- CORREÇÃO DE ASSETS ---
-  # A seção 'assets:' deve estar AQUI, com este recuo (dois espaços).
   assets:
-    # É melhor registrar a pasta inteira (com a barra / no final)
-    # Assim, qualquer imagem que você adicionar em 'assets/images/'
-    # será reconhecida automaticamente.
     - assets/images/
-    #
-    # Se preferir registrar apenas o arquivo exato (como estava antes):
-    # - assets/images/logo_evolution.png

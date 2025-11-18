@@ -2,17 +2,14 @@ import 'package:flutter/material.dart';
 import 'screens/home_page.dart';
 import 'screens/login_page.dart';
 import 'screens/progresso_page.dart';
-import 'screens/chat_page.dart';
-import 'screens/perfil_page.dart';
+import 'screens/motivation_page.dart';
+import 'screens/perfil_page.dart'; // Importado
 
-import 'services/hive_service.dart'; // Importa o novo serviço Hive
+import 'services/hive_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Inicializa o serviço Hive
   await HiveService().initializeHive();
-
   runApp(const EvolutionApp());
 }
 
@@ -24,7 +21,6 @@ class EvolutionApp extends StatelessWidget {
     return MaterialApp(
       title: 'Evolution App',
       debugShowCheckedModeBanner: false,
-
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
         colorScheme: ColorScheme.fromSwatch(
@@ -35,17 +31,16 @@ class EvolutionApp extends StatelessWidget {
         fontFamily: 'Roboto',
         useMaterial3: true,
       ),
-
-      // Widget inicial que decide o fluxo
       home: const SplashHandler(),
-
-      // 🔥 TODAS AS ROTAS AQUI!
       routes: {
         '/login': (context) => const LoginPage(),
         '/home': (context) => const HomePage(),
         '/progresso': (context) => const ProgressoPage(),
-        '/chat': (context) => const ChatPage(),
+        // 🔥 CORREÇÃO DA ROTA: 'motivation'
+        '/motivation': (context) => const MotivationPage(),
         '/perfil': (context) => const PerfilPage(),
+        // ROTAS ADICIONAIS: Você precisará de uma rota para adicionar hábito
+        // Exemplo: '/add_habit': (context) => const AddHabitPage(),
       },
     );
   }
@@ -68,11 +63,8 @@ class _SplashHandlerState extends State<SplashHandler> {
 
   void _redirect() async {
     await Future.delayed(Duration.zero);
-
     final isSetupComplete = HiveService().isSetupComplete;
-
     if (!mounted) return;
-
     if (!isSetupComplete) {
       Navigator.of(context).pushReplacementNamed('/login');
     } else {

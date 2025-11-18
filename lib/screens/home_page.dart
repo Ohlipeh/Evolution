@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:evolution/screens/progresso_page.dart';
+import 'package:evolution/screens/motivation_page.dart'; // Importação necessária
 import '../widgets/app_drawer.dart';
 import '../widgets/bottom_navbar.dart';
 import '../widgets/habit_card.dart';
@@ -25,6 +27,14 @@ class _HomePageState extends State<HomePage> {
       _dummyHabits[index]['done'] = !_dummyHabits[index]['done'];
     });
   }
+
+  // Função para navegar para Adicionar Hábito (Botão +)
+  void _navigateToAddHabit() {
+    // Aqui você navegaria para a rota que irá criar: '/add_habit'
+    // Navigator.pushNamed(context, '/add_habit');
+    print('Abrir tela de Adicionar Hábito');
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -103,15 +113,17 @@ class _HomePageState extends State<HomePage> {
         child: FloatingActionButton(
           backgroundColor: AppColors.secondaryPurple,
           elevation: 0,
-          onPressed: () {},
+          onPressed: _navigateToAddHabit, // Conecta a função ao botão +
           child: const Icon(Icons.add, size: 32, color: Colors.white),
         ),
       ),
 
-      bottomNavigationBar: const BottomNavBar(
+      // 🔥 CORREÇÃO: Passando o callback do botão + para o BottomNavBar
+      bottomNavigationBar: BottomNavBar(
         secondaryPurple: AppColors.secondaryPurple,
         secondaryPink: AppColors.secondaryPink,
         primaryDark: AppColors.primaryDark,
+        onAddPressed: _navigateToAddHabit, // Conecta o FAB
       ),
     );
   }
