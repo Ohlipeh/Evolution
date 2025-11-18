@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/hive_service.dart';
+import '../theme/app_colors.dart';
 
-// Esta tela não é mais um "Login", mas sim a "Configuração Inicial do Perfil"
-// para o banco de dados local (Hive).
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -11,91 +10,72 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  // Controladores para o campo de texto
   final _nameController = TextEditingController();
-  // Instância do nosso serviço de banco de dados
   final _hiveService = HiveService();
+
   bool _isLoading = false;
 
-  // --- Paleta de Cores do Design ---
-  // Cor principal do fundo (Azul escuro/preto)
-  static const Color primaryDark = Color(0xFF0F0E27);
-  // Cores do gradiente (Roxo e Rosa)
-  static const Color secondaryPurple = Color(0xFF4C15A7);
-  static const Color secondaryPink = Color(0xFFC700FF);
-
-  /// Lógica para lidar com a configuração inicial
   Future<void> _handleInitialSetup() async {
-    // Validação simples para garantir que o nome não está vazio
     if (_nameController.text.trim().isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Por favor, digite seu nome para começar.')),
+          const SnackBar(
+            content: Text('Por favor, digite seu nome para começar.'),
+          ),
         );
       }
       return;
     }
 
-    setState(() {
-      _isLoading = true; // Ativa o indicador de carregamento
-    });
+    setState(() => _isLoading = true);
 
     try {
-      // 1. Salva o nome do usuário no Hive
       await _hiveService.saveUserName(_nameController.text.trim());
-
-      // 2. Marca a configuração inicial como completa no Hive
       await _hiveService.markSetupComplete();
 
-      // Navegação para a Home Page após sucesso
       if (mounted) {
-        // Usa pushReplacementNamed para limpar a pilha e ir para a rota nomeada '/home'
         Navigator.of(context).pushReplacementNamed('/home');
       }
-    } catch (e) {
-      // Em caso de erro
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao salvar configuração: $e')),
-        );
-      }
     } finally {
-      setState(() {
-        _isLoading = false; // Desativa o indicador de carregamento
-      });
+      setState(() => _isLoading = false);
     }
   }
 
-  /// Widget reutilizável para criar o botão gradiente (estilo do seu design)
-  Widget _buildGradientButton({required String text, required VoidCallback onPressed}) {
+  Widget _buildGradientButton({
+    required String text,
+    required VoidCallback onPressed,
+  }) {
     return Container(
       width: double.infinity,
       height: 50,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(25), // Borda arredondada
+        borderRadius: BorderRadius.circular(25),
         gradient: const LinearGradient(
-          colors: [secondaryPurple, secondaryPink], // O gradiente do design
+          colors: [
+            AppColors.secondaryPurple,
+            AppColors.secondaryPink,
+          ],
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
         ),
-        boxShadow: [ // Sombra para dar profundidade
+        boxShadow: [
           BoxShadow(
-            color: secondaryPink.withOpacity(0.5),
-            blurRadius: 10,
+            color: AppColors.secondaryPink.withOpacity(0.4),
+            blurRadius: 12,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Material(
         color: Colors.transparent,
-        child: InkWell( // Efeito de clique (ripple)
+        child: InkWell(
           onTap: onPressed,
           borderRadius: BorderRadius.circular(25),
           child: Center(
             child: Text(
               text,
               style: const TextStyle(
-                color: Colors.white,
+                color: AppColors.textPrimary,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -109,77 +89,74 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: primaryDark, // Fundo escuro (conforme design)
+      backgroundColor: AppColors.primaryDark,
       appBar: AppBar(
-        backgroundColor: Colors.transparent, // Transparente para integrar ao fundo
+        backgroundColor: Colors.transparent,
         elevation: 0,
         title: const Text(
-            'Configuração Inicial',
-            style: TextStyle(color: Colors.white70)),
+          'Configuração Inicial',
+          style: TextStyle(color: AppColors.textSecondary),
+        ),
       ),
       body: Center(
-        child: SingleChildScrollView( // Permite rolagem se a tela for pequena
-          padding: const EdgeInsets.all(32.0),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(32),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              // --- Placeholder para o Logo de Astronauta ---
-              // --- Logo Oficial do App ---
-              // Certifique-se de que o caminho 'assets/images/logo_evolution.png' está correto.
+            children: [
               Image.asset(
                 'assets/images/logo_evolution.png',
-                // Ajuste a altura para um tamanho adequado ao seu design.
                 height: 150,
               ),
               const SizedBox(height: 60),
 
-              // --- Campo Nome (Estilo adaptado para o tema escuro) ---
+              // Campo Nome
               TextField(
                 controller: _nameController,
-                textCapitalization: TextCapitalization.words,
-                style: const TextStyle(color: Colors.white), // Texto digitado em branco
+                style: const TextStyle(color: AppColors.textPrimary),
                 decoration: InputDecoration(
                   labelText: 'Seu Nome ou Nickname',
-                  labelStyle: const TextStyle(color: Colors.white54),
+                  labelStyle:
+                  const TextStyle(color: AppColors.textSecondary),
                   filled: true,
-                  fillColor: Colors.white.withOpacity(0.1), // Fundo do campo
+                  fillColor: AppColors.inputBackground,
+                  prefixIcon:
+                  const Icon(Icons.person, color: AppColors.secondaryPink),
                   border: OutlineInputBorder(
-                    borderRadius: const BorderRadius.all(Radius.circular(12)),
-                    borderSide: BorderSide.none, // Sem borda padrão
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
                   ),
-                  focusedBorder: OutlineInputBorder( // Borda ao focar
-                    borderRadius: const BorderRadius.all(Radius.circular(12)),
-                    borderSide: BorderSide(color: secondaryPink, width: 2),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: AppColors.inputBorder,
+                      width: 2,
+                    ),
                   ),
-                  prefixIcon: const Icon(Icons.person, color: secondaryPink),
                 ),
               ),
+
               const SizedBox(height: 30),
 
-              // --- Botão Principal (Estilizado) ---
-              // Mostra o loading ou o botão
               _isLoading
-                  ? const CircularProgressIndicator(color: secondaryPink)
+                  ? const CircularProgressIndicator(
+                color: AppColors.secondaryPink,
+              )
                   : _buildGradientButton(
                 text: 'Começar a Evolução',
-                onPressed: _handleInitialSetup, // Chama a lógica do Hive
+                onPressed: _handleInitialSetup,
               ),
 
-              const SizedBox(height: 100), // Espaço antes dos ícones
+              const SizedBox(height: 80),
 
-              // --- Ícones Sociais (Substituídos por Nativos) ---
-              // Usamos ícones nativos para evitar o erro de compilação.
               const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Ícone nativo do Facebook
-                  Icon(Icons.facebook, size: 30, color: Colors.white70),
+                  Icon(Icons.facebook, color: AppColors.iconInactive),
                   SizedBox(width: 30),
-                  // Substituto nativo para Instagram
-                  Icon(Icons.camera_alt_outlined, size: 30, color: Colors.white70),
+                  Icon(Icons.camera_alt_outlined,
+                      color: AppColors.iconInactive),
                   SizedBox(width: 30),
-                  // Substituto nativo para LinkedIn
-                  Icon(Icons.work_outline, size: 30, color: Colors.white70),
+                  Icon(Icons.work_outline, color: AppColors.iconInactive),
                 ],
               ),
             ],
