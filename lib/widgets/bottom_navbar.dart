@@ -12,6 +12,12 @@ class BottomNavBar extends StatelessWidget {
     required this.primaryDark,
   });
 
+  void _navigate(BuildContext context, String route) {
+    if (ModalRoute.of(context)?.settings.name != route) {
+      Navigator.pushReplacementNamed(context, route);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -29,12 +35,32 @@ class BottomNavBar extends StatelessWidget {
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: const [
-          Icon(Icons.home, color: Colors.white, size: 30),
-          Icon(Icons.trending_up, color: Colors.white70, size: 30),
-          SizedBox(width: 40),
-          Icon(Icons.chat_bubble_outline, color: Colors.white70, size: 30),
-          Icon(Icons.person_outline, color: Colors.white70, size: 30),
+        children: [
+          // HOME
+          GestureDetector(
+            onTap: () => _navigate(context, '/home'),
+            child: const Icon(Icons.home, color: Colors.white, size: 30),
+          ),
+
+          // PROGRESSO
+          GestureDetector(
+            onTap: () => _navigate(context, '/progresso'),
+            child: const Icon(Icons.trending_up, color: Colors.white70, size: 30),
+          ),
+
+          const SizedBox(width: 40), // espaço pro botão central
+
+          // CHAT
+          GestureDetector(
+            onTap: () => _navigate(context, '/chat'),
+            child: const Icon(Icons.chat_bubble_outline, color: Colors.white70, size: 30),
+          ),
+
+          // PERFIL
+          GestureDetector(
+            onTap: () => _navigate(context, '/perfil'),
+            child: const Icon(Icons.person_outline, color: Colors.white70, size: 30),
+          ),
         ],
       ),
     );
