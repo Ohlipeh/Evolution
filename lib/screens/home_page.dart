@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 // import '../services/hive_service.dart'; // Descomente quando for usar dados reais
 // import '../model/habit_model.dart';    // Descomente quando for usar dados reais
+import 'package:evolution/screens/dashboard_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
