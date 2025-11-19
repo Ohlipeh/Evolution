@@ -5,45 +5,41 @@ class BottomNavBar extends StatelessWidget {
   final Color secondaryPink;
   final Color primaryDark;
 
-  // Novo Callback para o botão central FAB (Adicionar Hábito)
-  final VoidCallback onAddPressed;
-
   const BottomNavBar({
     super.key,
     required this.secondaryPurple,
     required this.secondaryPink,
     required this.primaryDark,
-    // Adicionado o callback obrigatório
-    required this.onAddPressed,
   });
 
-  /// Função utilitária para navegação de abas (limpa a pilha)
+  /// Função de navegação que substitui a tela atual para não empilhar infinitamente
   void _navigate(BuildContext context, String route) {
-    // Se a rota atual não for a desejada, navega
+    // Verifica se já não estamos na tela que queremos ir
     if (ModalRoute.of(context)?.settings.name != route) {
-      // Usamos pushReplacementNamed para substituir a tela e limpar a pilha
       Navigator.pushReplacementNamed(context, route);
     }
   }
 
-  /// Constrói um item clicável da barra de navegação
+  /// Constrói cada ícone da barra
   Widget _buildNavItem({
     required BuildContext context,
     required IconData icon,
     required String route,
-    required bool isSelected,
   }) {
+    // Verifica se esta é a rota ativa para destacar o ícone em branco
+    final bool isSelected = ModalRoute.of(context)?.settings.name == route;
+
     return Expanded(
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: () => _navigate(context, route),
+          borderRadius: BorderRadius.circular(40), // Feedback de toque redondo
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            padding: const EdgeInsets.symmetric(vertical: 15.0), // Aumenta a área de toque
             child: Icon(
               icon,
               size: 30,
-              // Ícone da página atual é branco, outros são cinza/inativos
               color: isSelected ? Colors.white : Colors.white70,
             ),
           ),
@@ -54,9 +50,6 @@ class BottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // O nome da rota atual é necessário para saber qual ícone destacar
-    final currentRoute = ModalRoute.of(context)?.settings.name ?? '/home';
-
     return Container(
       height: 80,
       decoration: BoxDecoration(
@@ -69,44 +62,31 @@ class BottomNavBar extends StatelessWidget {
           topLeft: Radius.circular(40),
           topRight: Radius.circular(40),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: secondaryPink.withOpacity(0.3),
+            blurRadius: 10,
+            offset: const Offset(0, -5),
+          ),
+        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          // HOME
-          _buildNavItem(
-            context: context,
-            icon: Icons.home,
-            route: '/home',
-            isSelected: currentRoute == '/home',
-          ),
+          // Botão HOME
+          _buildNavItem(context: context, icon: Icons.home, route: '/home'),
 
-          // PROGRESSO
-          _buildNavItem(
-            context: context,
-            icon: Icons.trending_up,
-            route: '/progresso',
-            isSelected: currentRoute == '/progresso',
-          ),
+          // Botão PROGRESSO (Gráfico)
+          _buildNavItem(context: context, icon: Icons.trending_up, route: '/progresso'),
 
-          // Espaço para o FAB (Floating Action Button)
-          SizedBox(width: 40),
+          // Espaço vazio no meio para o botão flutuante (+)
+          const SizedBox(width: 50),
 
-          // MOTIVAÇÃO (Chat)
-          _buildNavItem(
-            context: context,
-            icon: Icons.chat_bubble_outline,
-            route: '/motivation', // Assumindo que você usará /motivation para a tela de frase IA
-            isSelected: currentRoute == '/motivation',
-          ),
+          // Botão MOTIVAÇÃO (Chat/Frase)
+          _buildNavItem(context: context, icon: Icons.chat_bubble_outline, route: '/motivation'),
 
-          // PERFIL
-          _buildNavItem(
-            context: context,
-            icon: Icons.person_outline,
-            route: '/perfil',
-            isSelected: currentRoute == '/perfil',
-          ),
+          // Botão PERFIL
+          _buildNavItem(context: context, icon: Icons.person_outline, route: '/perfil'),
         ],
       ),
     );

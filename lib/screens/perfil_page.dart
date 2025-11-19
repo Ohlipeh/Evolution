@@ -3,14 +3,19 @@ import '../widgets/app_drawer.dart';
 import '../widgets/bottom_navbar.dart';
 import '../theme/app_colors.dart';
 
+import 'add_habito.dart'; // Import para a tela de adicionar
+
 class PerfilPage extends StatelessWidget {
   const PerfilPage({super.key});
 
-  // Função de navegação para Adicionar Hábito
+  // Função de navegação para Adicionar Hábito (Modal)
   void _navigateToAddHabit(BuildContext context) {
-    // Aqui você navegaria para a rota que irá criar: '/add_habit'
-    // Exemplo: Navigator.pushNamed(context, '/add_habit');
-    print('Abrir tela de Adicionar Hábito');
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const AddHabitPage(),
+        fullscreenDialog: true,
+      ),
+    );
   }
 
   @override
@@ -56,18 +61,16 @@ class PerfilPage extends StatelessWidget {
         child: FloatingActionButton(
           backgroundColor: AppColors.secondaryPurple,
           elevation: 0,
-          onPressed: () => _navigateToAddHabit(context), // CONEXÃO FAB
+          onPressed: () => _navigateToAddHabit(context), // FAB continua conectado aqui
           child: const Icon(Icons.add, size: 32, color: Colors.white),
         ),
       ),
 
       // --- BOTTOM NAV BAR CONECTADA ---
-      bottomNavigationBar: BottomNavBar(
+      bottomNavigationBar: const BottomNavBar(
         secondaryPurple: AppColors.secondaryPurple,
         secondaryPink: AppColors.secondaryPink,
         primaryDark: AppColors.primaryDark,
-        // Conecta o FAB da navbar ao mesmo método
-        onAddPressed: () => _navigateToAddHabit(context),
       ),
     );
   }

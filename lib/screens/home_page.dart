@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:evolution/screens/progresso_page.dart';
-import 'package:evolution/screens/motivation_page.dart'; // Importação necessária
 import '../widgets/app_drawer.dart';
 import '../widgets/bottom_navbar.dart';
 import '../widgets/habit_card.dart';
 import '../theme/app_colors.dart';
+import 'package:evolution/services/hive_service.dart';
+import 'package:evolution/model/habit_model.dart';
+
+import 'add_habito.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,39 +16,72 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final List<Map<String, dynamic>> _dummyHabits = [
-    {'name': 'Hábito 01', 'xp': 100, 'done': false},
-    {'name': 'Hábito 02', 'xp': 50, 'done': false},
-    {'name': 'Hábito 03', 'xp': 30, 'done': false},
-    {'name': 'Hábito 04', 'xp': 20, 'done': false},
-    {'name': 'Hábito 05', 'xp': 10, 'done': false},
-  ];
+  final HiveService _hiveService = HiveService();
+  List<HabitModel> _habits = [];
+  bool _isLoading = true;
 
-  void _toggleHabit(int index) {
+  @override
+  void initState() {
+    super.initState();
+    _loadHabits();
+  }
+
+  /// Carrega a lista de hábitos do banco de dados local
+  void _loadHabits() {
     setState(() {
-      _dummyHabits[index]['done'] = !_dummyHabits[index]['done'];
+      _habits = _hiveService.getAllHabits();
+      // Inverte a lista para os novos aparecerem no topo (opcional)
+      _habits = _habits.reversed.toList();
+      _isLoading = false;
     });
   }
 
-  // Função para navegar para Adicionar Hábito (Botão +)
-  void _navigateToAddHabit() {
-    // Aqui você navegaria para a rota que irá criar: '/add_habit'
-    // Navigator.pushNamed(context, '/add_habit');
-    print('Abrir tela de Adicionar Hábito');
+  /// Marca ou desmarca um hábito
+  void _toggleHabit(HabitModel habit) async {
+    final today = DateTime.now().toString().substring(0, 10); // Data YYYY-MM-DD
+
+    setState(() {
+      if (habit.completionHistory.contains(today)) {
+        habit.completionHistory.remove(today);
+      } else {
+        habit.completionHistory.add(today);
+      }
+    });
+
+    // Salva no Hive
+    await _hiveService.updateHabit(habit);
+    // Recarrega para garantir consistência
+    _loadHabits();
   }
 
+  /// Navega para a tela de adicionar hábito (Modal)
+  void _navigateToAddHabit() async {
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const AddHabitPage(),
+        fullscreenDialog: true, // Abre como um modal de tela cheia
+      ),
+    );
+
+    // Se a tela retornar 'true', significa que salvou algo novo, então recarrega
+    if (result == true) {
+      _loadHabits();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.primaryDark,
 
+      // Menu Lateral
       drawer: const AppDrawer(
         primaryDark: AppColors.primaryDark,
         secondaryPurple: AppColors.secondaryPurple,
         secondaryPink: AppColors.secondaryPink,
       ),
 
+      // Topo
       appBar: AppBar(
         backgroundColor: AppColors.primaryDark,
         elevation: 0,
@@ -68,6 +103,7 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
 
+      // Lista de Hábitos
       body: Column(
         children: [
           const SizedBox(height: 20),
@@ -84,17 +120,36 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 30),
 
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              itemCount: _dummyHabits.length,
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator(color: AppColors.secondaryPink))
+                : _habits.isEmpty
+                ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.post_add, size: 60, color: AppColors.textSecondary.withOpacity(0.5)),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Nenhum hábito ainda.\nClique no "+" para evoluir!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: AppColors.textSecondary, fontSize: 16),
+                  ),
+                ],
+              ),
+            )
+                : ListView.builder(
+              padding: const EdgeInsets.only(left: 20, right: 20, bottom: 100), // Espaço extra embaixo
+              itemCount: _habits.length,
               itemBuilder: (context, index) {
-                final habit = _dummyHabits[index];
+                final habit = _habits[index];
+                final today = DateTime.now().toString().substring(0, 10);
+                final isDone = habit.completionHistory.contains(today);
 
                 return HabitCard(
-                  name: habit['name'],
-                  xp: habit['xp'],
-                  done: habit['done'],
-                  onToggle: () => _toggleHabit(index),
+                  name: habit.name,
+                  xp: habit.xpValue,
+                  done: isDone,
+                  onToggle: () => _toggleHabit(habit),
                 );
               },
             ),
@@ -102,28 +157,28 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
 
+      // Botão Flutuante Central (+)
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Container(
         width: 70,
         height: 70,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(color: AppColors.primaryDark, width: 8),
+          border: Border.all(color: AppColors.primaryDark, width: 8), // Borda grossa para separar da barra
         ),
         child: FloatingActionButton(
           backgroundColor: AppColors.secondaryPurple,
-          elevation: 0,
-          onPressed: _navigateToAddHabit, // Conecta a função ao botão +
+          elevation: 5,
+          onPressed: _navigateToAddHabit, // Conecta ao modal de adicionar
           child: const Icon(Icons.add, size: 32, color: Colors.white),
         ),
       ),
 
-      // 🔥 CORREÇÃO: Passando o callback do botão + para o BottomNavBar
-      bottomNavigationBar: BottomNavBar(
+      // Barra de Navegação
+      bottomNavigationBar: const BottomNavBar(
         secondaryPurple: AppColors.secondaryPurple,
         secondaryPink: AppColors.secondaryPink,
         primaryDark: AppColors.primaryDark,
-        onAddPressed: _navigateToAddHabit, // Conecta o FAB
       ),
     );
   }
