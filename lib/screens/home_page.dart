@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:evolution/screens/habit_details_page.dart'; // 1. IMPORT ADICIONADO
 import '../widgets/habit_card.dart';
 import '../theme/app_colors.dart';
 import 'package:evolution/services/hive_service.dart';
@@ -44,6 +45,15 @@ class _HomePageState extends State<HomePage> {
 
     await _hiveService.updateHabit(habit);
     _loadHabits();
+  }
+
+  // 2. FUNÇÃO DE NAVEGAÇÃO ADICIONADA
+  void _navigateToHabitDetails(HabitModel habit) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => HabitDetailsPage(habit: habit),
+      ),
+    );
   }
 
   @override
@@ -120,7 +130,9 @@ class _HomePageState extends State<HomePage> {
                     name: habit.name,
                     xp: habit.xpValue,
                     done: isDone,
-                    onToggle: () => _toggleHabit(habit), onTap: () {  },
+                    onToggle: () => _toggleHabit(habit),
+                    // 3. CONEXÃO DO CLIQUE NO CARD
+                    onTap: () => _navigateToHabitDetails(habit),
                   );
                 },
               ),
