@@ -16,28 +16,30 @@ class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
 
   Future<void> _handleInitialSetup() async {
-    if (_nameController.text.trim().isEmpty) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Por favor, digite seu nome para começar.'),
-          ),
-        );
-      }
+    final name = _nameController.text.trim();
+
+    if (name.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Por favor, digite seu nome para começar.'),
+        ),
+      );
       return;
     }
 
     setState(() => _isLoading = true);
 
     try {
-      await _hiveService.saveUserName(_nameController.text.trim());
+      await _hiveService.saveUserName(name);
       await _hiveService.markSetupComplete();
 
-      if (mounted) {
-        Navigator.of(context).pushReplacementNamed('/home');
-      }
+      if (!mounted) return;
+
+      Navigator.pushReplacementNamed(context, '/home');
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -45,39 +47,40 @@ class _LoginPageState extends State<LoginPage> {
     required String text,
     required VoidCallback onPressed,
   }) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
       height: 50,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(25),
-        gradient: const LinearGradient(
-          colors: [
-            AppColors.secondaryPurple,
-            AppColors.secondaryPink,
-          ],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.secondaryPink.withOpacity(0.4),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [
+              AppColors.secondaryPurple,
+              AppColors.secondaryPink,
+            ],
           ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onPressed,
           borderRadius: BorderRadius.circular(25),
-          child: Center(
-            child: Text(
-              text,
-              style: const TextStyle(
-                color: AppColors.textPrimary,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.secondaryPink.withOpacity(0.4),
+              offset: const Offset(0, 4),
+              blurRadius: 12,
+            )
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(25),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(25),
+            onTap: onPressed,
+            child: Center(
+              child: Text(
+                text,
+                style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -89,15 +92,24 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // 🔥 Evita bug de teclado empurrar animações
+      resizeToAvoidBottomInset: true,
+
       backgroundColor: AppColors.primaryDark,
+
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
+        scrolledUnderElevation: 0, // 🔥 Fix no Material 3
         title: const Text(
           'Configuração Inicial',
-          style: TextStyle(color: AppColors.textSecondary),
+          style: TextStyle(
+            color: AppColors.textSecondary,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
+
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(32),
@@ -107,20 +119,20 @@ class _LoginPageState extends State<LoginPage> {
                 'assets/images/logo_evolution.png',
                 height: 150,
               ),
+
               const SizedBox(height: 60),
 
-              // Campo Nome
+              // Campo de Nome
               TextField(
                 controller: _nameController,
                 style: const TextStyle(color: AppColors.textPrimary),
                 decoration: InputDecoration(
                   labelText: 'Seu Nome ou Nickname',
-                  labelStyle:
-                  const TextStyle(color: AppColors.textSecondary),
+                  labelStyle: const TextStyle(color: AppColors.textSecondary),
                   filled: true,
                   fillColor: AppColors.inputBackground,
-                  prefixIcon:
-                  const Icon(Icons.person, color: AppColors.secondaryPink),
+                  prefixIcon: const Icon(Icons.person,
+                      color: AppColors.secondaryPink),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,

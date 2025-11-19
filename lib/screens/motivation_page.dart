@@ -20,7 +20,7 @@ class _MotivationPageState extends State<MotivationPage> {
     _fetchQuote();
   }
 
-  /// Busca a frase motivacional usando o serviço Gemini
+  /// Busca frase motivacional
   Future<void> _fetchQuote() async {
     setState(() {
       _isLoading = true;
@@ -29,14 +29,13 @@ class _MotivationPageState extends State<MotivationPage> {
 
     final quote = await _geminiService.generateMotivationalQuote();
 
-    // Atualiza o estado da tela
     setState(() {
       _quote = quote;
       _isLoading = false;
     });
   }
 
-  // Widget para o botão gradiente (reutilizado do login)
+  /// Botão gradient
   Widget _buildGradientButton({required String text, required VoidCallback onPressed}) {
     return Container(
       width: 250,
@@ -50,7 +49,7 @@ class _MotivationPageState extends State<MotivationPage> {
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.secondaryPink.withOpacity(0.5),
+            color: AppColors.secondaryPink.withOpacity(0.4),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -59,14 +58,17 @@ class _MotivationPageState extends State<MotivationPage> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: _isLoading ? null : onPressed, // Desabilita o botão enquanto carrega
+          onTap: _isLoading ? null : onPressed,
           borderRadius: BorderRadius.circular(25),
           child: Center(
             child: _isLoading
                 ? const SizedBox(
               width: 24,
               height: 24,
-              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+              child: CircularProgressIndicator(
+                color: Colors.white,
+                strokeWidth: 2,
+              ),
             )
                 : Text(
               text,
@@ -82,53 +84,37 @@ class _MotivationPageState extends State<MotivationPage> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.primaryDark,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white),
-            onPressed: () {},
-          ),
-        ],
-        centerTitle: true,
-        title: Image.asset(
-          'assets/images/logo_evolution.png',
-          height: 40,
-          errorBuilder: (_, __, ___) =>
-          const Icon(Icons.rocket_launch, color: AppColors.secondaryPink),
-        ),
-      ),
+
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(30.0),
+
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Texto da Frase Motivacional
-              Text(
-                _quote.toUpperCase(), // Frase em CAIXA ALTA
-                style: const TextStyle(
-                  color: AppColors.textPrimary,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w900,
-                  height: 1.5,
+              // Frase motivacional com UI mais bonita
+              AnimatedOpacity(
+                opacity: _isLoading ? 0.4 : 1.0,
+                duration: const Duration(milliseconds: 300),
+                child: Text(
+                  _quote.toUpperCase(),
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 26,
+                    fontWeight: FontWeight.w900,
+                    height: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 50),
 
-              // Botão Gerar Frase
+              const SizedBox(height: 60),
+
+              // Botão de gerar frase
               _buildGradientButton(
                 text: 'Gerar Frase',
                 onPressed: _fetchQuote,
@@ -137,8 +123,6 @@ class _MotivationPageState extends State<MotivationPage> {
           ),
         ),
       ),
-      // Não incluímos a BottomNavBar aqui para evitar duplicidade,
-      // mas ela será incluída pela HomePage se for a estrutura de abas
     );
   }
 }

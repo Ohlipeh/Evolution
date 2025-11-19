@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'screens/home_page.dart';
+import 'screens/mainpage.dart';
 import 'screens/login_page.dart';
 import 'screens/progresso_page.dart';
 import 'screens/motivation_page.dart';
-import 'screens/perfil_page.dart'; // Importado
-
+import 'screens/perfil_page.dart';
 import 'services/hive_service.dart';
 
 void main() async {
@@ -21,32 +20,33 @@ class EvolutionApp extends StatelessWidget {
     return MaterialApp(
       title: 'Evolution App',
       debugShowCheckedModeBanner: false,
+
+      // 🔥 Mantém sua paleta e sua identidade
       theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
-        colorScheme: ColorScheme.fromSwatch(
-          primarySwatch: Colors.deepPurple,
-          accentColor: Colors.amber,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.deepPurple,
           brightness: Brightness.light,
         ),
-        fontFamily: 'Roboto',
         useMaterial3: true,
+        fontFamily: 'Roboto',
       ),
+
+      // Tela inicial dinâmica
       home: const SplashHandler(),
+
+      // 🔥 Rotas centrais da aplicação
       routes: {
         '/login': (context) => const LoginPage(),
-        '/home': (context) => const HomePage(),
+        '/home': (context) => const MainPage(),
         '/progresso': (context) => const ProgressoPage(),
-        // 🔥 CORREÇÃO DA ROTA: 'motivation'
         '/motivation': (context) => const MotivationPage(),
         '/perfil': (context) => const PerfilPage(),
-        // ROTAS ADICIONAIS: Você precisará de uma rota para adicionar hábito
-        // Exemplo: '/add_habit': (context) => const AddHabitPage(),
       },
     );
   }
 }
 
-/// Widget que lida com a verificação inicial de autenticação/setup
+/// SPLASH que decide para onde mandar o usuário
 class SplashHandler extends StatefulWidget {
   const SplashHandler({super.key});
 
@@ -61,14 +61,17 @@ class _SplashHandlerState extends State<SplashHandler> {
     _redirect();
   }
 
-  void _redirect() async {
-    await Future.delayed(Duration.zero);
-    final isSetupComplete = HiveService().isSetupComplete;
+  Future<void> _redirect() async {
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    final bool isSetupComplete = HiveService().isSetupComplete;
+
     if (!mounted) return;
+
     if (!isSetupComplete) {
-      Navigator.of(context).pushReplacementNamed('/login');
+      Navigator.pushReplacementNamed(context, '/login');
     } else {
-      Navigator.of(context).pushReplacementNamed('/home');
+      Navigator.pushReplacementNamed(context, '/home');
     }
   }
 
