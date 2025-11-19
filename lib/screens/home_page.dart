@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:evolution/screens/habit_details_page.dart'; // 1. IMPORT ADICIONADO
+import 'package:evolution/screens/habit_details_page.dart';
 import '../widgets/habit_card.dart';
 import '../theme/app_colors.dart';
 import 'package:evolution/services/hive_service.dart';
@@ -47,13 +47,48 @@ class _HomePageState extends State<HomePage> {
     _loadHabits();
   }
 
-  // 2. FUNÇÃO DE NAVEGAÇÃO ADICIONADA
+  /// Navega para detalhes
   void _navigateToHabitDetails(HabitModel habit) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => HabitDetailsPage(habit: habit),
       ),
     );
+  }
+
+  /// Excluir hábito com confirmação
+  void _deleteHabit(HabitModel habit) async {
+    final confirm = await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppColors.primaryDark,
+          title: const Text(
+            "Excluir Hábito",
+            style: TextStyle(color: Colors.white),
+          ),
+          content: const Text(
+            "Tem certeza que deseja excluir este hábito?",
+            style: TextStyle(color: Colors.white70),
+          ),
+          actions: [
+            TextButton(
+              child: const Text("Cancelar", style: TextStyle(color: Colors.grey)),
+              onPressed: () => Navigator.pop(context, false),
+            ),
+            TextButton(
+              child: const Text("Excluir", style: TextStyle(color: Colors.redAccent)),
+              onPressed: () => Navigator.pop(context, true),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirm == true) {
+      await _hiveService.deleteHabit(habit.id);
+      _loadHabits();
+    }
   }
 
   @override
@@ -65,13 +100,12 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: AppColors.primaryDark,
         elevation: 0,
         centerTitle: true,
-        toolbarHeight: 10, // Remove altura do appbar (ficamos só com statusbar)
+        toolbarHeight: 0,
       ),
 
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 25),
 
@@ -95,44 +129,45 @@ class _HomePageState extends State<HomePage> {
                 ),
               )
                   : _habits.isEmpty
-                  ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.auto_awesome,
-                    size: 70,
-                    color: AppColors.textSecondary.withOpacity(0.5),
-                  ),
-                  const SizedBox(height: 15),
-                  const Text(
-                    'Nenhum hábito ainda.\nClique no "+" para evoluir!',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 18,
+                  ? Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.auto_awesome,
+                      size: 70,
+                      color: AppColors.textSecondary.withOpacity(0.5),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 15),
+                    const Text(
+                      'Nenhum hábito ainda.\nClique no "+" para evoluir!',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
+                ),
               )
                   : ListView.separated(
                 physics: const BouncingScrollPhysics(),
                 itemCount: _habits.length,
-                separatorBuilder: (_, __) =>
-                const SizedBox(height: 16),
+                separatorBuilder: (_, __) => const SizedBox(height: 16),
                 itemBuilder: (context, index) {
                   final habit = _habits[index];
-                  final today =
-                  DateTime.now().toString().substring(0, 10);
-                  final isDone =
-                  habit.completionHistory.contains(today);
+                  final today = DateTime.now().toString().substring(0, 10);
+                  final isDone = habit.completionHistory.contains(today);
 
                   return HabitCard(
                     name: habit.name,
                     xp: habit.xpValue,
                     done: isDone,
                     onToggle: () => _toggleHabit(habit),
-                    // 3. CONEXÃO DO CLIQUE NO CARD
                     onTap: () => _navigateToHabitDetails(habit),
+
+                    // 🔥 Novo: botão de excluir
+                    onDelete: () => _deleteHabit(habit),
                   );
                 },
               ),

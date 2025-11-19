@@ -40,10 +40,12 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    final paddingBottom = MediaQuery.of(context).padding.bottom;
+
     return Scaffold(
       backgroundColor: AppColors.primaryDark,
 
-      // -------------------- END DRAWER (à direita) --------------------
+      // -------------------- END DRAWER --------------------
       endDrawer: Drawer(
         backgroundColor: AppColors.primaryDark,
         child: ListView(
@@ -119,17 +121,15 @@ class _MainPageState extends State<MainPage> {
         ),
       ),
 
-      // -------------------- APPBAR (menu à direita) --------------------
+      // -------------------- APPBAR --------------------
       appBar: AppBar(
         backgroundColor: AppColors.primaryDark,
         elevation: 0,
         centerTitle: true,
-
         title: Image.asset(
           'assets/images/logo_evolution.png',
           height: 40,
         ),
-
         actions: [
           Builder(
             builder: (context) => IconButton(
@@ -144,26 +144,51 @@ class _MainPageState extends State<MainPage> {
         ],
       ),
 
-      // Conteúdo dinâmico
-      body: _pages[_currentIndex],
-
-      // ---------------- FAB ----------------
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.secondaryPurple,
-        elevation: 6,
-        onPressed: _openAddHabit,
-        child: const Icon(Icons.add, size: 32),
+      // -------------------- SAFE AREA --------------------
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.only(bottom: paddingBottom),
+          child: _pages[_currentIndex],
+        ),
       ),
 
-      // ---------------- BOTTOM NAV BAR ----------------
-      bottomNavigationBar: _buildBottomNavBar(),
+      // -------------------- FLOATING BUTTON (PERFEITO) --------------------
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: Container(
+        width: 68,
+        height: 68,
+        decoration: BoxDecoration(
+          color: AppColors.primaryDark,
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: Colors.white24,
+            width: 2,
+          ),
+        ),
+        child: FloatingActionButton(
+          backgroundColor: AppColors.primaryDark,
+          elevation: 0,
+          highlightElevation: 0,
+          splashColor: Colors.transparent,
+          shape: const CircleBorder(),
+          onPressed: _openAddHabit,
+          child: const Icon(
+            Icons.add,
+            size: 34,
+            color: Colors.white,
+          ),
+        ),
+      ),
+
+      // -------------------- BOTTOM NAV BAR --------------------
+      bottomNavigationBar: _buildBottomNavBar(paddingBottom),
     );
   }
 
-  Widget _buildBottomNavBar() {
+  Widget _buildBottomNavBar(double paddingBottom) {
     return Container(
-      height: 80,
+      height: 80 + paddingBottom,
+      padding: EdgeInsets.only(bottom: paddingBottom),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [AppColors.secondaryPurple, AppColors.secondaryPink],
@@ -180,7 +205,7 @@ class _MainPageState extends State<MainPage> {
         children: [
           _item(Icons.home, 0),
           _item(Icons.trending_up, 1),
-          const SizedBox(width: 40),
+          const SizedBox(width: 40), // espaço para o FAB
           _item(Icons.chat_bubble_outline, 2),
           _item(Icons.person_outline, 3),
         ],

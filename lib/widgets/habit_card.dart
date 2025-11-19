@@ -6,7 +6,8 @@ class HabitCard extends StatelessWidget {
   final int xp;
   final bool done;
   final VoidCallback onToggle;
-  final VoidCallback onTap; // Novo callback para abrir detalhes
+  final VoidCallback onTap;
+  final VoidCallback onDelete; // 🔥 NOVO: callback da lixeira
 
   const HabitCard({
     super.key,
@@ -14,13 +15,14 @@ class HabitCard extends StatelessWidget {
     required this.xp,
     required this.done,
     required this.onToggle,
-    required this.onTap, // Obrigatório agora
+    required this.onTap,
+    required this.onDelete, // 🔥 OBRIGATÓRIO AGORA
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap, // Clicar no card abre os detalhes
+      onTap: onTap, // abre detalhes
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
@@ -37,9 +39,9 @@ class HabitCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // --- CHECKBOX (Botão independente) ---
+            // ---------------- CHECKBOX ----------------
             GestureDetector(
-              onTap: onToggle, // Clicar aqui marca/desmarca
+              onTap: onToggle,
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 width: 32,
@@ -47,24 +49,16 @@ class HabitCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: done ? AppColors.secondaryPink : AppColors.primaryDark,
                   shape: BoxShape.circle,
-                  boxShadow: done
-                      ? [
-                    BoxShadow(
-                      color: AppColors.secondaryPink.withOpacity(0.5),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    )
-                  ]
-                      : [],
                 ),
                 child: done
                     ? const Icon(Icons.check, color: Colors.white, size: 20)
                     : null,
               ),
             ),
+
             const SizedBox(width: 16),
 
-            // --- NOME DO HÁBITO ---
+            // ---------------- TÍTULO ----------------
             Expanded(
               child: Text(
                 name,
@@ -78,13 +72,28 @@ class HabitCard extends StatelessWidget {
               ),
             ),
 
-            // --- VALOR DE XP ---
+            // ---------------- XP ----------------
             Text(
               '+${xp}XP',
               style: TextStyle(
                 color: done ? Colors.grey : AppColors.secondaryPink,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(width: 12),
+
+            // ---------------- LIXEIRA ----------------
+            GestureDetector(
+              onTap: () {
+                // Evita clicar no card ao tocar na lixeira
+                onDelete();
+              },
+              child: const Icon(
+                Icons.delete_outline,
+                color: Colors.redAccent,
+                size: 26,
               ),
             ),
           ],
