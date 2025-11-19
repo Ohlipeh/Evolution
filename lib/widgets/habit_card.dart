@@ -6,6 +6,7 @@ class HabitCard extends StatelessWidget {
   final int xp;
   final bool done;
   final VoidCallback onToggle;
+  final VoidCallback onTap; // Novo callback para abrir detalhes
 
   const HabitCard({
     super.key,
@@ -13,81 +14,81 @@ class HabitCard extends StatelessWidget {
     required this.xp,
     required this.done,
     required this.onToggle,
+    required this.onTap, // Obrigatório agora
   });
 
   @override
   Widget build(BuildContext context) {
-    final Color cardColor = AppColors.cardLight;                    // card claro
-    final Color textColor = done ? AppColors.textSecondary : AppColors.textDark;
-    final Color xpColor = done ? AppColors.textSecondary : AppColors.secondaryPink;
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.20),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Círculo de done
-          GestureDetector(
-            onTap: onToggle,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 250),
-              width: 34,
-              height: 34,
-              decoration: BoxDecoration(
-                color: done ? AppColors.secondaryPink : AppColors.primaryDark,
-                shape: BoxShape.circle,
-                boxShadow: done
-                    ? [
-                  BoxShadow(
-                    color: AppColors.secondaryPink.withValues(alpha: 0.45),
-                    blurRadius: 10,
-                    offset: const Offset(0, 3),
-                  )
-                ]
-                    : [],
+    return GestureDetector(
+      onTap: onTap, // Clicar no card abre os detalhes
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+        decoration: BoxDecoration(
+          color: AppColors.cardLight,
+          borderRadius: BorderRadius.circular(30),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 5,
+              offset: const Offset(0, 3),
+            )
+          ],
+        ),
+        child: Row(
+          children: [
+            // --- CHECKBOX (Botão independente) ---
+            GestureDetector(
+              onTap: onToggle, // Clicar aqui marca/desmarca
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: done ? AppColors.secondaryPink : AppColors.primaryDark,
+                  shape: BoxShape.circle,
+                  boxShadow: done
+                      ? [
+                    BoxShadow(
+                      color: AppColors.secondaryPink.withOpacity(0.5),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    )
+                  ]
+                      : [],
+                ),
+                child: done
+                    ? const Icon(Icons.check, color: Colors.white, size: 20)
+                    : null,
               ),
-              child: done
-                  ? const Icon(Icons.check, color: Colors.white, size: 20)
-                  : null,
             ),
-          ),
+            const SizedBox(width: 16),
 
-          const SizedBox(width: 16),
+            // --- NOME DO HÁBITO ---
+            Expanded(
+              child: Text(
+                name,
+                style: TextStyle(
+                  color: done ? Colors.grey : AppColors.textDark,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  decoration: done ? TextDecoration.lineThrough : null,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
 
-          // Nome do hábito
-          Expanded(
-            child: Text(
-              name,
+            // --- VALOR DE XP ---
+            Text(
+              '+${xp}XP',
               style: TextStyle(
-                color: textColor,
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                decoration: done ? TextDecoration.lineThrough : null,
+                color: done ? Colors.grey : AppColors.secondaryPink,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
               ),
             ),
-          ),
-
-          // XP
-          Text(
-            '+${xp}XP',
-            style: TextStyle(
-              color: xpColor,
-              fontSize: 16,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

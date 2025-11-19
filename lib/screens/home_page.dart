@@ -120,7 +120,7 @@ class _HomePageState extends State<HomePage> {
                     name: habit.name,
                     xp: habit.xpValue,
                     done: isDone,
-                    onToggle: () => _toggleHabit(habit),
+                    onToggle: () => _toggleHabit(habit), onTap: () {  },
                   );
                 },
               ),
