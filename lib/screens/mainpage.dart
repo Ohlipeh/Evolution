@@ -24,7 +24,6 @@ class _MainPageState extends State<MainPage> {
     PerfilPage(),
   ];
 
-  /// Abrir modal de adicionar hábito
   void _openAddHabit() async {
     final result = await Navigator.push(
       context,
@@ -44,8 +43,8 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
       backgroundColor: AppColors.primaryDark,
 
-      // -------------------- DRAWER FUNDIDO AQUI --------------------
-      drawer: Drawer(
+      // -------------------- END DRAWER (à direita) --------------------
+      endDrawer: Drawer(
         backgroundColor: AppColors.primaryDark,
         child: ListView(
           padding: EdgeInsets.zero,
@@ -82,8 +81,7 @@ class _MainPageState extends State<MainPage> {
 
             ListTile(
               leading: const Icon(Icons.home, color: Colors.white),
-              title:
-              const Text('Início', style: TextStyle(color: Colors.white)),
+              title: const Text('Início', style: TextStyle(color: Colors.white)),
               onTap: () {
                 Navigator.pop(context);
                 setState(() => _currentIndex = 0);
@@ -92,8 +90,7 @@ class _MainPageState extends State<MainPage> {
 
             ListTile(
               leading: const Icon(Icons.trending_up, color: Colors.white),
-              title: const Text('Progresso',
-                  style: TextStyle(color: Colors.white)),
+              title: const Text('Progresso', style: TextStyle(color: Colors.white)),
               onTap: () {
                 Navigator.pop(context);
                 setState(() => _currentIndex = 1);
@@ -102,8 +99,7 @@ class _MainPageState extends State<MainPage> {
 
             ListTile(
               leading: const Icon(Icons.person, color: Colors.white),
-              title:
-              const Text('Perfil', style: TextStyle(color: Colors.white)),
+              title: const Text('Perfil', style: TextStyle(color: Colors.white)),
               onTap: () {
                 Navigator.pop(context);
                 setState(() => _currentIndex = 3);
@@ -114,8 +110,7 @@ class _MainPageState extends State<MainPage> {
 
             ListTile(
               leading: const Icon(Icons.logout, color: Colors.redAccent),
-              title: const Text('Sair',
-                  style: TextStyle(color: Colors.redAccent)),
+              title: const Text('Sair', style: TextStyle(color: Colors.redAccent)),
               onTap: () {
                 Navigator.pushReplacementNamed(context, '/login');
               },
@@ -124,19 +119,17 @@ class _MainPageState extends State<MainPage> {
         ),
       ),
 
-      // ---------------- APPBAR ----------------
+      // -------------------- APPBAR (menu à direita) --------------------
       appBar: AppBar(
         backgroundColor: AppColors.primaryDark,
         elevation: 0,
         centerTitle: true,
 
-        // Logo central
         title: Image.asset(
           'assets/images/logo_evolution.png',
           height: 40,
         ),
 
-        // Menu hambúrguer à direita
         actions: [
           Builder(
             builder: (context) => IconButton(
@@ -145,16 +138,16 @@ class _MainPageState extends State<MainPage> {
                 color: Colors.white,
                 size: 30,
               ),
-              onPressed: () => Scaffold.of(context).openDrawer(),
+              onPressed: () => Scaffold.of(context).openEndDrawer(),
             ),
           ),
         ],
       ),
 
-      // -------------- CONTEÚDO DINÂMICO --------------
+      // Conteúdo dinâmico
       body: _pages[_currentIndex],
 
-      // -------------- FLOATING ACTION BUTTON --------------
+      // ---------------- FAB ----------------
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.secondaryPurple,
@@ -163,12 +156,11 @@ class _MainPageState extends State<MainPage> {
         child: const Icon(Icons.add, size: 32),
       ),
 
-      // -------------- BOTTOM NAV BAR --------------
+      // ---------------- BOTTOM NAV BAR ----------------
       bottomNavigationBar: _buildBottomNavBar(),
     );
   }
 
-  // ---------------- BOTTOM NAV BAR ----------------
   Widget _buildBottomNavBar() {
     return Container(
       height: 80,
@@ -196,7 +188,6 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  // Ícones com seleção
   Widget _item(IconData icon, int index) {
     final bool selected = index == _currentIndex;
 
