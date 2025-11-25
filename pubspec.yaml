@@ -14,6 +14,8 @@ dependencies:
   flutter:
     sdk: flutter
 
+  image_picker: ^1.0.7
+
   # --- Dependência da API GEMINI (NOVO) ---
   google_generative_ai: ^0.4.7 # Use a versão mais recente e estável
 
